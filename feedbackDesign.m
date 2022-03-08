@@ -20,7 +20,7 @@ clc
 run lateralDynamics;
 
 %% PID based loop (inner loop) assembly --> input ep = eInner
-% PID controller definition
+% PID controller definition -- roll rate
 Rp = tunablePID('Rp', 'PID');
 Rp.Kp.Value = 1e+2;
 Rp.Ki.Value = 1e+2;
@@ -35,7 +35,7 @@ Rp.y = '\delta_{lat}';
 eInner = sumblk('e_{p} = p0 - p');
 
 %% P based loop (outer loop) assembly --> input ephi = eOuter
-% P controller definition 
+% P controller definition -- roll angle
 Rphi = tunablePID('Rphi', 'P');
 Rphi.Kp.Value = 1e+2;
 
@@ -55,7 +55,7 @@ eOuter = sumblk('e_{\phi} = \phi0 - \phi');
 %                  +<-------------------------------------------+
 %
 
-F = connect(G, Rp, eInner, Rphi, eOuter, {'\phi_0'}, {'p', '\phi'});
+F = connect(G_nom, Rp, eInner, Rphi, eOuter, {'\phi0'}, {'p', '\phi'});
 
 %% control effort function assembly 
 % there are requirements on the effort to be made in order to control the
@@ -69,7 +69,7 @@ F = connect(G, Rp, eInner, Rphi, eOuter, {'\phi_0'}, {'p', '\phi'});
 %                  +<-------------------------------------------+
 %
 
-T0 = connect(G, Rp, eInner, Rphi, eOuter, {'\phi0'}, {'e_{\phi}', '\delta_{lat}'}); 
+T0 = connect(G_nom, Rp, eInner, Rphi, eOuter, {'\phi0'}, {'e_{\phi}', '\delta_{lat}'}); 
 
 %% 2nd order phi0 response transfer function assembly 
 % design requirements: [A] nominal performance --> phi response to phi0
@@ -79,7 +79,7 @@ T0 = connect(G, Rp, eInner, Rphi, eOuter, {'\phi0'}, {'e_{\phi}', '\delta_{lat}'
 damp    = 0.9; % 2nd order function damping coefficient
 omega_n = 10;  % 2nd order function natural frequency 
 
-% ideal complementary sensitivity function assembly WS -> 1/WS = WSinv 
+% ideal complementary sensitivity function assembly WF -> 1/WF = WFinv 
 % transfer function assembly 
 WFinv = tf(omega_n^2, [1, 2*damp*omega_n, omega_n^2]);
 
@@ -96,7 +96,6 @@ omega_b = 5;    % lowerbound bandwidth sensitivity
 WPinv = tf([1, omega_b*A], [1/M, omega_b]);
 
 %% control moderation
-
 % control effort moderation weight function 
 WQinv = 0.5 * tf([1/900, 1], [1/170, 1]);
 
@@ -108,57 +107,56 @@ rng('default');
 nTest = 10; 
 
 % setting up system requirements -- given by assignment 
-% TuningGoal.WeightedGain allows setting up a frequency-weighted gain
+% --> TuningGoal.WeightedGain allows setting up a frequency-weighted gain
 % constraint 
-req = [ TuningGoal.WeightedGain('\phi0', 'e_{\phi}',    1/WPinv, 1);
-        TuningGoal.WeightedGain('\phi0', 'delta_{lat}', 1/WQinv, 1) ];
+req = [ TuningGoal.WeightedGain('\phi0', 'e_{\phi}', 1/WPinv, 1);
+        TuningGoal.WeightedGain('\phi0', '\delta_{lat}', 1/WQinv, 1) ];
 
-%% tuning 
+%% controllers tuning -- P & PID
 % setting up tuning options 
 opt = systuneOptions('RandomStart', nTest, 'SoftTol', 1e-7, 'Display', 'iter');
 
 % tuning control system 
-[T, J, ~] = systune(T0, Req, opt);
+[T, J, ~] = systune(T0, req, opt);
 
 % getting values from the tuning results
-R_p   = T.blocks.R_p;
-R_phi = T.blocks.R_phi;
+Rp   = T.blocks.Rp;
+Rphi = T.blocks.Rphi;
 
 %% doublet input response analysis
 % setting up input 
 dt = 1e-2;                      % computational time step 
-t1 = [0:dt:1];                  % 1st time interval 
-t2 = [1 + dt:dt:3];             % 2nd time interval
-t3 = [3 + dt:dt:5];             % 3rd time interval 
-t4 = [5 + dt:dt:10];            % 4th time interval 
-t  = [t1', t2', t3', t4'];      % overall time interval 
+t1 = 0:dt:1;                    % 1st time interval 
+t2 = 1 + dt:dt:3;               % 2nd time interval
+t3 = 3 + dt:dt:5;               % 3rd time interval 
+t4 = 5 + dt:dt:10;              % 4th time interval 
+t  = [t1'; t2'; t3'; t4'];      % overall time interval 
 
 % doblet input declaration 
 % t1 -> 0
 % t2 -> 10 
 % t3 -> -10 
 % t4 -> 0
-u = [   zeros(length(t1),1); 
-        10*ones(length(t2),1); 
-        -10*ones(length(t3),1); 
-        zeros(length(t4),1) ];
+u = [ zeros(length(t1),1); 
+      10*ones(length(t2),1); 
+      -10*ones(length(t3),1); 
+      zeros(length(t4),1) ];
 
 % computing system response and translating it into time domain 
 [y, x] = lsim(T(2).A, T(2).B, T(2).C, T(2).D, u, t);
 
 %% figure plot
-fig1 = figure(1)
+fig1 = figure(1);
 bodemag(WPinv);
 hold on
 grid on
 grid minor 
 bodemag(T(1));  % == sensitivity bode plot 
 legend('Wp', 'Optimized system', 'location', 'northwest')
-title('title')
 
 saveas(fig1, 'figure\fig1', 'epsc');
 
-fig2 = figure(2)
+fig2 = figure(2);
 bodemag(minreal(T(1)/WPinv));
 grid on
 grid minor 
@@ -166,20 +164,23 @@ title('Sensitivity under the weight')
 
 saveas(fig2, 'figure\fig2', 'epsc');
 
-fig3 = figure(3)
+fig3 = figure(3);
 bodemag(WQinv);
 grid on 
 grid minor 
 hold on 
 bodemag(T(2));
-legend('Wp', 'Optimized system', 'location', 'northwest')
+legend('Wp', 'Optimized system', 'location', 'southeast')
 
 saveas(fig3, 'figure\fig3', 'epsc');
 
-fig4 = figure(4)
-plot(t, y, t, y);
+doubletResponse = figure(4);
+plot(t, y);
+hold on 
+plot(t, u);
 grid on 
 grid minor 
-title('Uncertain response')
+title('Doublet response')
+legend('Output', 'Input');
 
-saveas(fig4, 'figure\fig4', 'epsc');
+saveas(doubletResponse, 'figure\doubletResponse', 'epsc');
