@@ -8,9 +8,9 @@
 %   --- analysis, design and verification of a quadrirotor, ANT-R, single axis attitude control system 
 %
 %   this program:
-%   --- feedback design, analysis and verification for the unstable lateral
-%   dynamics analised in the Gstudy.m script
-%
+%   --- feedback design for the nominal part of G with respect to given control system behaviour
+%   --- analysis and verification for the unstable lateral dynamics analised in the Gstudy.m script
+%       
 
 clear variables
 close all 
