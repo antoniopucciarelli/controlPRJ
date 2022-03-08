@@ -79,34 +79,107 @@ T0 = connect(G, Rp, eInner, Rphi, eOuter, {'\phi0'}, {'e_{\phi}', '\delta_{lat}'
 damp    = 0.9; % 2nd order function damping coefficient
 omega_n = 10;  % 2nd order function natural frequency 
 
-% ideal complementary sensitivity function assembly 
+% ideal complementary sensitivity function assembly WS -> 1/WS = WSinv 
 % transfer function assembly 
 WFinv = tf(omega_n^2, [1, 2*damp*omega_n, omega_n^2]);
 
-% ideal sensitivity 
+% ideal sensitivity function assembly WS -> 1/WS_ideal = WSinv_ideal
+% transfer function assembly 
 WSinv_ideal = minreal(1-WFinv); % pole-zero cancellation function 
 
-% sensitivity weight
-A = 1e-4; 
-M = 1.2; 
-omega_b = 5;
+%% sensitivity weight WP -> 1/WP = WPinv
+A = 1e-4;       % low frequency value of the sensitivity 
+M = 1.2;        % M >= 1/damping ratio
+omega_b = 5;    % lowerbound bandwidth sensitivity 
 
-% 
+% transfer function assembly 
 WPinv = tf([1, omega_b*A], [1/M, omega_b]);
 
-%% control moderation 
-% this part allows to tune the control system in oder to satisfy the assignment requirements
+%% control moderation
+
+% control effort moderation weight function 
 WQinv = 0.5 * tf([1/900, 1], [1/170, 1]);
 
-%% robust control analysis 
-% enabling random number generator in the system 
+%% system constraint  
+% enabling random number generator in the system  
 rng('default');
 
 % setting up number of tests to be done 
 nTest = 10; 
 
 % setting up system requirements -- given by assignment 
-req = [ TuningGoal.WeightedGain('\phi0', 'e_{\phi}', 1/WPinv, 1);
-        TuningGoal.WeightedGain('\phi0', 'delta_{lat}', 1/WQinv, 1)];
+% TuningGoal.WeightedGain allows setting up a frequency-weighted gain
+% constraint 
+req = [ TuningGoal.WeightedGain('\phi0', 'e_{\phi}',    1/WPinv, 1);
+        TuningGoal.WeightedGain('\phi0', 'delta_{lat}', 1/WQinv, 1) ];
 
-        
+%% tuning 
+% setting up tuning options 
+opt = systuneOptions('RandomStart', nTest, 'SoftTol', 1e-7, 'Display', 'iter');
+
+% tuning control system 
+[T, J, ~] = systune(T0, Req, opt);
+
+% getting values from the tuning results
+R_p   = T.blocks.R_p;
+R_phi = T.blocks.R_phi;
+
+%% doublet input response analysis
+% setting up input 
+dt = 1e-2;                      % computational time step 
+t1 = [0:dt:1];                  % 1st time interval 
+t2 = [1 + dt:dt:3];             % 2nd time interval
+t3 = [3 + dt:dt:5];             % 3rd time interval 
+t4 = [5 + dt:dt:10];            % 4th time interval 
+t  = [t1', t2', t3', t4'];      % overall time interval 
+
+% doblet input declaration 
+% t1 -> 0
+% t2 -> 10 
+% t3 -> -10 
+% t4 -> 0
+u = [   zeros(length(t1),1); 
+        10*ones(length(t2),1); 
+        -10*ones(length(t3),1); 
+        zeros(length(t4),1) ];
+
+% computing system response and translating it into time domain 
+[y, x] = lsim(T(2).A, T(2).B, T(2).C, T(2).D, u, t);
+
+%% figure plot
+fig1 = figure(1)
+bodemag(WPinv);
+hold on
+grid on
+grid minor 
+bodemag(T(1));  % == sensitivity bode plot 
+legend('Wp', 'Optimized system', 'location', 'northwest')
+title('title')
+
+saveas(fig1, 'figure\fig1', 'epsc');
+
+fig2 = figure(2)
+bodemag(minreal(T(1)/WPinv));
+grid on
+grid minor 
+title('Sensitivity under the weight')
+
+saveas(fig2, 'figure\fig2', 'epsc');
+
+fig3 = figure(3)
+bodemag(WQinv);
+grid on 
+grid minor 
+hold on 
+bodemag(T(2));
+legend('Wp', 'Optimized system', 'location', 'northwest')
+
+saveas(fig3, 'figure\fig3', 'epsc');
+
+fig4 = figure(4)
+plot(t, y, t, y);
+grid on 
+grid minor 
+title('Uncertain response')
+
+saveas(fig4, 'figure\fig4', 'epsc');
