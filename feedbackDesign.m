@@ -138,7 +138,7 @@ t3 = 3 + dt:dt:5;               % 3rd time interval
 t4 = 5 + dt:dt:10;              % 4th time interval 
 t  = [t1'; t2'; t3'; t4'];      % overall time interval 
 
-% doblet input declaration 
+% doublet input declaration 
 % t1 -> 0
 % t2 -> 10 
 % t3 -> -10 
@@ -150,6 +150,11 @@ u = [ zeros(length(t1),1);
 
 % computing system response and translating it into time domain 
 [y, x] = lsim(T(2).A, T(2).B, T(2).C, T(2).D, u, t);
+
+%% uncertain system assembly 
+% this new system contains the uncertainty of the system dynamics
+% the complete plant is made by the uncertain system dynamics equipped with the P and PID controllers from the nominal design study 
+T0 = connect(G, R_p, Sum_ep, R_phi, Sum_ephi,{'\phi0'}, {'e_{\phi}','\delta_{lat}'});
 
 %% figure plot
 fig1 = figure(1);
