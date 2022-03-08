@@ -103,7 +103,7 @@ WQinv = 0.5 * tf([1/900, 1], [1/170, 1]);
 % enabling random number generator in the system  
 rng('default');
 
-% setting up number of tests to be done 
+% setting up number of tests to be done by the system tuning algorithm -- systune --
 nTest = 10; 
 
 % setting up system requirements -- given by assignment 
@@ -114,9 +114,15 @@ req = [ TuningGoal.WeightedGain('\phi0', 'e_{\phi}', 1/WPinv, 1);
 
 %% controllers tuning -- P & PID
 % setting up tuning options 
+% -- relative tolerance setup -> SoftTol = 1e-7
+% -- # of tests to be done -> RandomStart = nTest  
 opt = systuneOptions('RandomStart', nTest, 'SoftTol', 1e-7, 'Display', 'iter');
 
 % tuning control system 
+% systune gets in input parametrized transfer functions and parametrized constraint/requirements 
+% input definition: 
+% -- closed loop model -> T0 
+% -- control requirements (in this case soft requirements only) -> req
 [T, J, ~] = systune(T0, req, opt);
 
 % getting values from the tuning results
