@@ -73,9 +73,9 @@ T0 = connect(G_nom, Rp, eInner, Rphi, eOuter, {'\phi0'}, {'e_{\phi}', '\delta_{l
 
 %% 2nd order phi0 response transfer function assembly 
 % design requirements: [A] nominal performance --> phi response to phi0
-% input has to follow 2nd order response with xi and natural frequency
-% given 
+% input has to follow 2nd order response with damping (damp) and natural frequency (omega_n) given 
 
+% setting up variables
 damp    = 0.9; % 2nd order function damping coefficient
 omega_n = 10;  % 2nd order function natural frequency 
 
@@ -113,7 +113,7 @@ req = [ TuningGoal.WeightedGain('\phi0', 'e_{\phi}', 1/WPinv, 1);
         TuningGoal.WeightedGain('\phi0', '\delta_{lat}', 1/WQinv, 1) ];
 
 %% controllers tuning -- P & PID
-% setting up tuning options 
+% setting up tuning options
 % -- relative tolerance setup -> SoftTol = 1e-7
 % -- # of tests to be done -> RandomStart = nTest  
 opt = systuneOptions('RandomStart', nTest, 'SoftTol', 1e-7, 'Display', 'iter');
@@ -122,7 +122,7 @@ opt = systuneOptions('RandomStart', nTest, 'SoftTol', 1e-7, 'Display', 'iter');
 % systune gets in input parametrized transfer functions and parametrized constraint/requirements 
 % input definition: 
 % -- closed loop model -> T0 
-% -- control requirements (in this case soft requirements only) -> req
+% -- control constraints/goals -> req
 [T, J, ~] = systune(T0, req, opt);
 
 % getting values from the tuning results
