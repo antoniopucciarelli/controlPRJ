@@ -58,8 +58,7 @@ eOuter = sumblk('e_{\phi} = \phi0 - \phi');
 F = connect(G_nom, Rp, eInner, Rphi, eOuter, {'\phi0'}, {'p', '\phi'});
 
 %% control effort function assembly 
-% there are requirements on the effort to be made in order to control the
-% system 
+% there are requirements on the effort to be made in order to control the system 
 % this control effort is related to delta_lat with respect to phi0 changes
 % 
 %                   eOuter             eInner      delta_lat
