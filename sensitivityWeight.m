@@ -3,6 +3,10 @@
 % -- compute: A, M, omega_b that allow to satisfy the 2nd order response of the system 
 %
 
+clear variables
+close all 
+clc
+
 % constraint values 
 damp = 0.9;
 omega_n = 10; 
@@ -13,7 +17,7 @@ tol = -79;
 freq = 1e-5;
 
 % setting up possible intervals for the parameters 
-dimA = 10;
+dimA = 2;
 dimM = 10; 
 dimOmega_b = 10; 
 
@@ -23,7 +27,7 @@ Mideal = 1/damp;
 % setting up study vectors:
 Avec       = linspace(5e-5, 1e-4, dimA);             
 Mvec       = linspace(Mideal, Mideal*1.1, dimM);
-omega_bVec = linspace(0.5*omega_n, 0.6*omega_n, dimOmega_b);
+omega_bVec = linspace(0.3*omega_n, 0.8*omega_n, dimOmega_b);
 
 % transfer function declaration 
 WPinv = @(A, M, omega_b) tf([1, omega_b*A], [1/M, omega_b]);
@@ -47,15 +51,16 @@ for A = Avec
 
                 fprintf('\n\tsteady state error close to 0 (so db -> -Inf)\n');
                 fprintf('\t\tmagnitude (db) @ omega = %f rad/s\n\t\tmagnitude = %f db\n\n', freq, magnitude);
-                break 
+                
+                fprintf('function parameters after tuning:\n\t* A = %f\n\t* M = %f\n\t* omega_b = %f\n', A, M, omega_b);
+                
+                figure(1);
+                bodemag(WPinv(A, M, omega_b));
+                grid on
+                grid minor 
+                
+                return
             end
         end
     end
 end
-
-figure(1);
-bodemag(WPinv(A, M, omega_b));
-grid on
-grid minor 
-
-fprintf('function parameters after tuning:\n\t* A = %f\n\t* M = %f\n\t* omega_b = %f\n', A, M, omega_b);
