@@ -65,7 +65,7 @@ G = ss(A, B, C, D);
 % input name
 G.u = '\delta_{lat}'; 
 % output name
-G.y = {'p', '\phi'};
+G.y = {'p','\phi'};
 
 % setting up nominal G -> nominal plant model 
 G_nom = G.nominal;

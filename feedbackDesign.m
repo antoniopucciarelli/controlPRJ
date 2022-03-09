@@ -87,9 +87,7 @@ WFinv = tf(omega_n^2, [1, 2*damp*omega_n, omega_n^2]);
 WSinv_ideal = minreal(1-WFinv); % pole-zero cancellation function 
 
 %% sensitivity weight WP -> 1/WP = WPinv
-A = 1e-4;       % low frequency value of the sensitivity 
-M = 1.2;        % M >= 1/damping ratio
-omega_b = 5;    % lowerbound bandwidth sensitivity 
+[A, M, omega_b] = sensitivityWeight(damp, omega_n, false); 
 
 % transfer function assembly 
 WPinv = tf([1, omega_b*A], [1/M, omega_b]);
@@ -128,6 +126,14 @@ opt = systuneOptions('RandomStart', nTest, 'SoftTol', 1e-7, 'Display', 'iter');
 Rp   = T.blocks.Rp;
 Rphi = T.blocks.Rphi;
 
+% setting up input and output names 
+Rp.u = 'e_{p}'; 
+Rp.y = '\delta_{lat}';
+
+% setting up input and output names
+Rphi.u = 'e_{\phi}'; 
+Rphi.y = 'p0';
+
 %% doublet input response analysis
 % setting up input 
 dt = 1e-2;                      % computational time step 
@@ -153,7 +159,7 @@ u = [ zeros(length(t1),1);
 %% uncertain system assembly 
 % this new system contains the uncertainty of the system dynamics
 % the complete plant is made by the uncertain system dynamics equipped with the P and PID controllers from the nominal design study 
-T0 = connect(G, R_p, Sum_ep, R_phi, Sum_ephi,{'\phi0'}, {'e_{\phi}','\delta_{lat}'});
+T0 = connect(G, Rp, eInner, Rphi, eOuter, {'\phi0'}, {'e_{\phi}', '\delta_{lat}'}); 
 
 %% figure plot
 fig1 = figure(1);
