@@ -11,6 +11,10 @@ function [A, M, omega_b] = sensitivityWeight(damp, omega_n, args)
 %   this program: 
 %   --- tuning sensitivity weight to be used in the overall plant tuning via systune  
 %   --- compute: A, M, omega_b that allow to satisfy the 2nd order response of the system 
+%   --- this is an alternative sensitivity weight function with respect to the one given following 'directly' the assignment
+%       this because:
+%       --- most of the times it is better using a simpler transfer function with the same important behaviours of the more complicated ones
+%       --- most of the times systune gives problem with the analysis of complicated transfer functions
 %
 %   input:
 %   --- damp: 2nd order function damping ratio 
@@ -62,7 +66,7 @@ for A = Avec
 
             % computing transfer function magnitude at freq 
             [magnitude, ~] = bode(WPinv(A, M, omega_b), freq); 
-            % converting magnitude in decibed unit
+            % converting magnitude in decibel unit
             magnitude = 20 * log10(magnitude);
             
             % checking if results satisfy given constraints
@@ -78,8 +82,8 @@ for A = Avec
                 
                 if args == true
                     % bode plot of the transfer function -- sensitivity weight function 
-                    figure(1);
-                    bodemag(WPinv(A, M, omega_b));
+                    figure
+                    bode(WPinv(A, M, omega_b));
                     grid on
                     grid minor 
                 end 
