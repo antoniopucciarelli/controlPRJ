@@ -8,7 +8,7 @@ function [A, M, omega_b] = sensitivityWeight(damp, omega_n, args)
 %   problem description: 
 %   --- analysis, design and verification of a quadrirotor, ANT-R, single axis attitude control system 
 %
-%   this program: 
+%   this function: 
 %   --- tuning sensitivity weight to be used in the overall plant tuning via systune  
 %   --- compute: A, M, omega_b that allow to satisfy the 2nd order response of the system 
 %   --- this is an alternative sensitivity weight function with respect to the one given following 'directly' the assignment

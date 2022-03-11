@@ -93,8 +93,11 @@ WSinv_ideal = minreal(1-WFinv); % pole-zero cancellation function
 WPinv = tf([1, omega_b*A], [1/M, omega_b]);
 
 %% control moderation
+gain     = 0.5;
+control1 = 900;
+control2 = 170;
 % control effort moderation weight function 
-WQinv = 0.5 * tf([1/900, 1], [1/170, 1]);
+WQinv = gain * tf([1/control1, 1], [1/control2, 1]);
 
 %% system constraint  
 % enabling random number generator in the system  
@@ -167,8 +170,8 @@ bodemag(WPinv);
 hold on
 grid on
 grid minor 
-bodemag(T(1));  % == sensitivity bode plot 
-legend('Wp', 'Optimized system', 'location', 'northwest')
+bodemag(T(1));  % ~= sensitivity bode plot 
+legend('W_P', 'Optimized system', 'location', 'northwest')
 
 saveas(fig1, 'figure\fig1', 'epsc');
 
@@ -186,7 +189,7 @@ grid on
 grid minor 
 hold on 
 bodemag(T(2));
-legend('Wp', 'Optimized system', 'location', 'southeast')
+legend('W_Q', 'Optimized system', 'location', 'southeast')
 
 saveas(fig3, 'figure\fig3', 'epsc');
 
