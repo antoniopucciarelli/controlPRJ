@@ -47,27 +47,34 @@ Rphi.y = 'p0';
 eOuter = sumblk('e_{\phi} = \phi0 - \phi');
 
 %% complementary sensitivity assembly 
+% lateral dynamics block + P & PID controllers
+% it allows to understand how the double closed loop system behaves with respect to phi0
 % 
-%                   eOuter             eInner      delta_lat
-%         phi0 --->O----->[ Rphi ]-->O------->[ Rp ]---[ G ]-+--+---> phi
-%                - |               - |                       |  |
-%                  |                 +<----------------------+  |
-%                  +<-------------------------------------------+
+%             eOuter        p0   eInner       delta_lat
+%   phi0 --->O----->[ Rphi ]-->O------->[ Rp ]---------[ G ]-+--+---> phi
+%          - |               - |                           p |  |
+%            |                 +<----------------------------+  |
+%            +<-------------------------------------------------+
 %
 
 F = connect(G_nom, Rp, eInner, Rphi, eOuter, {'\phi0'}, {'p', '\phi'});
 
 %% control effort function assembly 
-% there are requirements on the effort to be made in order to control the system 
-% this control effort is related to delta_lat with respect to phi0 changes
+% this transfer function for the double closed loop system relates the input phi0 with the 
+% roll angle error and the lateral dynamics input (delta)
 % 
-%                   eOuter             eInner      delta_lat
-%         phi0 --->O----->[ Rphi ]-->O------->[ Rp ]---[ G ]-+--+---> phi
-%                - |               - |                       |  |
-%                  |                 +<----------------------+  |
-%                  +<-------------------------------------------+
+%             eOuter        p0   eInner       delta_lat
+%   phi0 --->O----->[ Rphi ]-->O------->[ Rp ]---------[ G ]-+--+---> phi
+%          - |               - |                           p |  |
+%            |                 +<----------------------------+  |
+%            +<-------------------------------------------------+
 %
-
+% connect() function
+% input: 
+% --- phi0
+% outputs:  
+% --- phi error (eOuter)
+% --- delta
 T0 = connect(G_nom, Rp, eInner, Rphi, eOuter, {'\phi0'}, {'e_{\phi}', '\delta_{lat}'}); 
 
 %% 2nd order phi0 response transfer function assembly 
@@ -78,24 +85,30 @@ T0 = connect(G_nom, Rp, eInner, Rphi, eOuter, {'\phi0'}, {'e_{\phi}', '\delta_{l
 damp    = 0.9; % 2nd order function damping coefficient
 omega_n = 10;  % 2nd order function natural frequency 
 
-% ideal complementary sensitivity function assembly WF -> 1/WF = WFinv 
-% transfer function assembly 
+% ideal complementary sensitivity function assembly WF
+% WF relates phi0 to phi through eOuter  
 WFinv = tf(omega_n^2, [1, 2*damp*omega_n, omega_n^2]);
 
-% ideal sensitivity function assembly WS -> 1/WS_ideal = WSinv_ideal
-% transfer function assembly 
-WSinv_ideal = minreal(1-WFinv); % pole-zero cancellation function 
+% ideal sensitivity function assembly WS 
+% eOuter = phi0 - phi = (1 - WFinv) * phi0 
+% T0 links eOuter (e_phi) to phi0 input 
+WSinv = minreal(1 - WFinv); % pole-zero cancellation after sensitivity function assembly  
 
-%% sensitivity weight WP -> 1/WP = WPinv
+% sensitivity weight WP 
+% coefficients computation 
 [A, M, omega_b] = sensitivityWeight(damp, omega_n, false); 
 
 % transfer function assembly 
+% WP relates phi0 to delta 
 WPinv = tf([1, omega_b*A], [1/M, omega_b]);
 
 %% control moderation
+% design requirements: [B] nominal performance --> phi response to phi0 attenuation
+% for a doublet input at |phi0| = 10 -> |delta| <= 5 
 gain     = 0.5;
 control1 = 900;
 control2 = 170;
+
 % control effort moderation weight function 
 WQinv = gain * tf([1/control1, 1], [1/control2, 1]);
 

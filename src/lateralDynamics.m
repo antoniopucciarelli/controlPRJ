@@ -9,21 +9,8 @@
 %
 %   this program:
 %   --- assembles the lateral dynamics of the ANT-R quadrirotor 
-%   --- sets the plot interpreter 
 %   --- adds the data path for the quadrirotor study  
 %
-
-%% adding path for data and setting latex plot interpreter
-%thisPath = pwd;
-%addpath(append(thisPath, '\data\'));
-
-% setting latex plot interpreter
-list_factory = fieldnames(get(groot,'factory'));
-index_interpreter = find(contains(list_factory,'Interpreter'));
-for i = 1:length(index_interpreter)
-    default_name = strrep(list_factory{index_interpreter(i)},'factory','default');
-    set(groot, default_name,'latex');
-end
 
 %% lateral dynamics system properties allocation
 % data allocation -- nominal 

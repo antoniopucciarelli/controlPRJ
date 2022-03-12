@@ -15,6 +15,9 @@ function [A, M, omega_b] = sensitivityWeight(damp, omega_n, args)
 %       this because:
 %       --- most of the times it is better using a simpler transfer function with the same important behaviours of the more complicated ones
 %       --- most of the times systune gives problem with the analysis of complicated transfer functions
+%   --- transfer function law: x0 * (s + x1) / (s + x2) -> 1 zero + 1 pole transfer function 
+%       this because:  
+%       --- need to catch the behaviour of a 2nd order transfer function (already declared)
 %
 %   input:
 %   --- damp: 2nd order function damping ratio 
@@ -37,7 +40,10 @@ dimA       = 10;
 dimM       = 10; 
 dimOmega_b = 10; 
 
-% from theory 
+% from theory: Multivariable feedback control [table. 2.1] 
+% --- table 2.1 suggests values around 1.15 and 1.22
+% --- approximated as 1/damp -> 1/0.9 ~ 1.11
+% --- because there is a loop Mideal starts from 1/damp value and then it goes up 
 Mideal = 1/damp;
 
 % setting up study vectors:

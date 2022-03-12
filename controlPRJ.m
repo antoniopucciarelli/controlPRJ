@@ -15,6 +15,10 @@
 %    
 %   !!! import first all the directories !!!
 
+clear 
+close all 
+clc
+
 % importing \src folder 
 % --- in \src are stored all the program and the functions 
 thisPath = pwd;
