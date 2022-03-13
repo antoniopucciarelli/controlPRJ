@@ -44,14 +44,13 @@ dimOmega_b = 10;
 % --- table 2.1 relates Ms to 2nd order sensitivity transfer functions 
 % --- table 2.1 suggests values around 1.15 and 1.22
 % --- since problems in systune() -> decided to use a different transfer function
-% --- because there is a loop Mideal starts from 1/damp value and then it goes up 
 % --- Ms = |S|_Inf 
 Ms_ideal = 1.185;
 
 % setting up study vectors:
 Avec       = linspace(5e-5, 1e-4, dimA);                        % from theory: A == behaviour at low frequencies (maximum steady state tracking error)            
 Mvec       = linspace(Ms_ideal*0.98, Ms_ideal*1.02, dimM);      % from theory: M > 1 behaviour at high frequencies
-omega_bVec = linspace(0.3*omega_n, 1.1*omega_n, dimOmega_b);        % from theory: omega_b == bandwidth requirement (frequency interval where we can see important changes from the transfer function)
+omega_bVec = linspace(0.3*omega_n, 1.1*omega_n, dimOmega_b);    % from theory: omega_b == bandwidth requirement (frequency interval where we can see important changes from the transfer function)
 
 % transfer function declaration -- sensitivity weight
 % from theory: Multivariable feedback control [eqn. 2.73]

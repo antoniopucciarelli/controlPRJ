@@ -12,8 +12,6 @@
 %   system (given by the assignment text)
 %
 
-clear variables
-close all 
 clc
 
 %% lateral dynamics assembly process 

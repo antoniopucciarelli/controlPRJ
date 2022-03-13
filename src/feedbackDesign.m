@@ -12,8 +12,6 @@
 %   --- analysis and verification for the unstable lateral dynamics analised in the Gstudy.m script
 %       
 
-clear variables
-close all 
 clc
 
 %% lateral dynamics assembly process 
@@ -109,8 +107,8 @@ WPinv = tf([1, omega_b*A], [1/M, omega_b]);
 % this time it has been used the same (2.44) refernce equation from skogestad book 
 % but the tuning has been done thrught a trial and error approach 
 A       = 0.5;
-M       = 0.2;
-omega_b = 3.1e+3; 
+M       = 0.12;
+omega_b = 1.43e+3; 
 
 % control effort moderation weight function
 % WQinv relates phi0 to delta 

@@ -34,6 +34,10 @@ run Gstudy;
 %% system tuning 
 run feedbackDesign; 
 
+%% robust analysis
+
+%% design verification 
+
 %% removing path 
 thisPath = pwd;
 % removing \src path 
