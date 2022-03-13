@@ -144,6 +144,10 @@ opt = systuneOptions('RandomStart', nTest, 'SoftTol', 1e-7, 'Display', 'iter');
 Rp   = T.blocks.Rp;
 Rphi = T.blocks.Rphi;
 
+% block coefficients after tuning
+pid(Rp)
+pid(Rphi) 
+
 % setting up input and output names 
 Rp.u = 'e_{p}'; 
 Rp.y = '\delta_{lat}';

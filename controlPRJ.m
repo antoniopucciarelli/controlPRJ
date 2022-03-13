@@ -29,7 +29,7 @@ addpath(append(thisPath, '\src\'));
 addpath(append(thisPath, '\data\'));
 
 %% G(s) study -> system lateral dynamics study 
-run Gstudy; 
+%run Gstudy; 
 
 %% system tuning 
 run feedbackDesign; 
