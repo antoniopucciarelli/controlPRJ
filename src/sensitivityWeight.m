@@ -37,7 +37,7 @@ freq = 1e-5;
 
 % setting up possible intervals for the parameters 
 dimA       = 10;
-dimM       = 10; 
+dimM       = 100; 
 dimOmega_b = 10; 
 
 % from theory: Multivariable feedback control [table. 2.1] 
@@ -51,7 +51,7 @@ Ms_ideal = 1.185;
 % setting up study vectors:
 Avec       = linspace(5e-5, 1e-4, dimA);                        % from theory: A == behaviour at low frequencies (maximum steady state tracking error)            
 Mvec       = linspace(Ms_ideal*0.98, Ms_ideal*1.02, dimM);      % from theory: M > 1 behaviour at high frequencies
-omega_bVec = linspace(omega_n, 1.1*omega_n, dimOmega_b);        % from theory: omega_b == bandwidth requirement (frequency interval where we can see important changes from the transfer function)
+omega_bVec = linspace(0.3*omega_n, 1.1*omega_n, dimOmega_b);        % from theory: omega_b == bandwidth requirement (frequency interval where we can see important changes from the transfer function)
 
 % transfer function declaration -- sensitivity weight
 % from theory: Multivariable feedback control [eqn. 2.73]
@@ -67,7 +67,7 @@ for A = Avec
             test = test + 1;
             
             % main quantities computation
-            [Gm,Pm,Wcg,Wcp] = margin(WPinv(A, M, omega_b));
+            [~,~,~,Wcp] = margin(WPinv(A, M, omega_b));
 
             if args == true
                 % printing results
@@ -80,7 +80,7 @@ for A = Avec
             magnitude = 20 * log10(magnitude);
             
             % checking if results satisfy given constraints
-            if Wcp > 10 && magnitude <= tol 
+            if Wcp >= 10 && magnitude <= tol 
                 % printing results
                 fprintf('Result\ntarget:');
                 fprintf('\n\tcrossover frequency -> Wcp > 10\n\t\tWcp = %f rad/s\n', Wcp);

@@ -85,33 +85,36 @@ T0 = connect(G_nom, Rp, eInner, Rphi, eOuter, {'\phi0'}, {'e_{\phi}', '\delta_{l
 damp    = 0.9; % 2nd order function damping coefficient
 omega_n = 10;  % 2nd order function natural frequency 
 
-% ideal complementary sensitivity function assembly WF
-% WF relates phi0 to phi 
+% ideal performance complementary sensitivity function assembly WFinv
+% WFinv relates phi0 to phi 
 % y = T * r -> skogestad (2.44)  
 WFinv = tf(omega_n^2, [1, 2*damp*omega_n, omega_n^2]);
 
-% ideal sensitivity function assembly WS 
+% ideal performance sensitivity function assembly WSinv 
 % eOuter = phi0 - phi = (1 - WFinv) * phi0 
 % T0 links eOuter (e_phi) to phi0 input 
 WSinv = minreal(1 - WFinv); % pole-zero cancellation after sensitivity function assembly  
 
-% sensitivity weight WP 
+% performance sensitivity weight WPinv 
 % coefficients computation 
 [A, M, omega_b] = sensitivityWeight(damp, omega_n, false); 
 
-% transfer function assembly 
-% WP relates phi0 to delta 
+% performance transfer function assembly 
+% WPinv relates phi0 to eOuter
 WPinv = tf([1, omega_b*A], [1/M, omega_b]);
 
 %% control moderation
 % design requirements: [B] nominal performance --> phi response to phi0 attenuation
 % for a doublet input at |phi0| = 10 -> |delta| <= 5 
-gain     = 0.5;
-control1 = 900;
-control2 = 170;
+% this time it has been used the same (2.44) refernce equation from skogestad book 
+% but the tuning has been done thrught a trial and error approach 
+A       = 0.5;
+M       = 0.2;
+omega_b = 3.1e+3; 
 
-% control effort moderation weight function 
-WQinv = gain * tf([1/control1, 1], [1/control2, 1]);
+% control effort moderation weight function
+% WQinv relates phi0 to delta 
+WQinv = tf([1, omega_b*A], [1/M, omega_b]); 
 
 %% system constraint  
 % enabling random number generator in the system  

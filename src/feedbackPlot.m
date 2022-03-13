@@ -14,40 +14,41 @@
 
 % 1st constraint related plot 
 sensitivityWeight = figure;
-bodemag(WPinv);
+bodemag(WPinv, 'b');
 hold on
 grid on
 grid minor 
-bodemag(T(1));  
-legend('W_{P}', 'Optimized system', 'location', 'northwest')
+bodemag(T(1), 'r');  
+legend('1/WP', 'Tuned system', 'location', 'northwest')
 title('1st constraint check')
 saveas(sensitivityWeight, 'figure\sensitivityWeight', 'epsc');
 
+% sensitivity vs performance weight check
 sensitivityCheck = figure;
-bodemag(minreal(T(1)/WPinv));
+bodemag(minreal(T(1)/WPinv), 'b');
 grid on
 grid minor 
-title('Sensitivity under the weight')
+title('Sensitivity under the weight: |WP * S|_{Inf} < 1')
 saveas(sensitivityCheck, 'figure\sensitivityCheck', 'epsc');
 
 % 2nd constraint related plot 
 controlWeight = figure;
-bodemag(WQinv);
+bodemag(WQinv, 'b')
 grid on 
 grid minor 
 hold on 
-bodemag(T(2));
-legend('W_Q', 'Optimized system', 'location', 'southeast')
+bodemag(T(2), 'r')
+legend('1/WQ', 'Tuned system', 'location', 'southeast')
 title('2nd constraint check')
 saveas(controlWeight, 'figure\controlWeight', 'epsc');
 
 % doublet response
 doubletResponse = figure;
-plot(t, y);
+plot(t, y, 'b', 'linewidth', 2);
 hold on 
-plot(t, u);
+plot(t, u, '--r', 'linewidth', 1.5);
 grid on 
 grid minor 
-title('Doublet response')
-legend('Output', 'Input');
+title(['Doublet response -> Delta max = ' num2str(max(abs(y)))])
+legend('Output: delta', 'Input: doublet');
 saveas(doubletResponse, 'figure\doubletResponse', 'epsc');
