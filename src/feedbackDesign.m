@@ -86,7 +86,8 @@ damp    = 0.9; % 2nd order function damping coefficient
 omega_n = 10;  % 2nd order function natural frequency 
 
 % ideal complementary sensitivity function assembly WF
-% WF relates phi0 to phi through eOuter  
+% WF relates phi0 to phi 
+% y = T * r -> skogestad (2.44)  
 WFinv = tf(omega_n^2, [1, 2*damp*omega_n, omega_n^2]);
 
 % ideal sensitivity function assembly WS 
