@@ -1,3 +1,4 @@
+function feedbackPlot(WPinv, WSinv, WQinv, T, t, y, u)
 %   AEROSPACE CONTROL SYSTEM PROJECT -- AY 2021/2022
 %   authors:
 %       * Mate-Erik Moni 
@@ -8,7 +9,7 @@
 %   --- analysis, design and verification of a quadrirotor, ANT-R, single axis attitude control system 
 %
 %   this program:
-%   --- plot of the nominal tuned system 
+%   --- plot of the nominal tuned system -- used in Feedback design section in the presentation 
 %   --- plot of the uncertain system using the nominal tuning parameters 
 %     
 
@@ -72,3 +73,5 @@ grid minor
 title(['Doublet response -> Delta max = ' num2str(max(abs(y)))])
 legend('Output: delta', 'Input: doublet');
 saveas(doubletResponse, 'figure\doubletResponse', 'epsc');
+
+end 

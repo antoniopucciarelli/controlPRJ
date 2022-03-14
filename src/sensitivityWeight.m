@@ -81,13 +81,13 @@ for A = Avec
             % checking if results satisfy given constraints
             if Wcp >= 10 && magnitude <= tol 
                 % printing results
-                fprintf('Result\ntarget:');
+                fprintf('Sensitivity weight results\ntarget:');
                 fprintf('\n\tcrossover frequency -> Wcp > 10\n\t\tWcp = %f rad/s\n', Wcp);
 
                 fprintf('\n\tsteady state error close to 0 (so db -> -Inf)\n');
                 fprintf('\t\tmagnitude (db) @ omega = %f rad/s\n\t\tmagnitude = %f db\n\n', freq, magnitude);
                 
-                fprintf('function parameters after tuning:\n\t* A = %f\n\t* M = %f\n\t* omega_b = %f\n', A, M, omega_b);
+                fprintf('function parameters after tuning:\n\t* A = %f\n\t* M = %f\n\t* omega_b = %f\n\n', A, M, omega_b);
                 
                 if args == true
                     % bode plot of the transfer function -- sensitivity weight function 

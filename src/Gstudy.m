@@ -23,7 +23,6 @@ nominalPolesZeros = figure;
 hNominal = pzplot(G.Nominal);
 grid on
 grid minor 
-
 saveas(nominalPolesZeros, 'figure\nominalPolesZeros', 'epsc');
 
 %% uncertain G analsys
@@ -32,7 +31,6 @@ uncertainPolesZeros = figure;
 hUncertain = pzplot(G);
 grid on 
 grid minor
-
 saveas(uncertainPolesZeros, 'figure\uncertainPolesZeros', 'epsc');
 
 %% frequency response study 
@@ -41,7 +39,6 @@ bodePlot = figure;
 bodemag(G, 'y', G.Nominal, 'k', {1e-3,1e+3});
 grid on 
 grid minor
-
 saveas(bodePlot, 'figure\bodePlot', 'epsc');
 
 %% step response study 
@@ -54,5 +51,4 @@ stepResponse = figure;
 step(usample(G,n), interval);
 grid on 
 grid minor 
-
 saveas(stepResponse, 'figure\stepResponse', 'epsc');

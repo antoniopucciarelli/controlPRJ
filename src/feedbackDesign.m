@@ -105,7 +105,7 @@ WPinv = tf([1, omega_b*A], [1/M, omega_b]);
 % design requirements: [B] nominal performance --> phi response to phi0 attenuation
 % for a doublet input at |phi0| = 10 -> |delta| <= 5 
 % this time it has been used the same (2.44) refernce equation from skogestad book 
-% but the tuning has been done thrught a trial and error approach 
+% but the tuning has been done throught a trial and error approach 
 A       = 0.5;
 M       = 0.12;
 omega_b = 1.43e+3; 
@@ -131,7 +131,7 @@ req = [ TuningGoal.WeightedGain('\phi0', 'e_{\phi}', 1/WPinv, 1);
 % setting up tuning options
 % -- relative tolerance setup -> SoftTol = 1e-7
 % -- # of tests to be done -> RandomStart = nTest  
-opt = systuneOptions('RandomStart', nTest, 'SoftTol', 1e-7, 'Display', 'iter');
+opt = systuneOptions('RandomStart', nTest, 'SoftTol', 1e-7, 'Display', 'final');
 
 % tuning control system 
 % systune gets in input parametrized transfer functions and parametrized constraint/requirements 
@@ -145,8 +145,10 @@ Rp   = T.blocks.Rp;
 Rphi = T.blocks.Rphi;
 
 % block coefficients after tuning
-pid(Rp)
-pid(Rphi) 
+[Rphi_Kp,~,~,~] = piddata(Rphi);
+[Rp_Kp,Rp_Ki,Rp_Kd,~] = piddata(Rp);
+fprintf('\nNominal system tuning results:\nP block:\n\tKp = %f\n\n', Rphi_Kp);
+fprintf('PID block:\n\tKp = %f\n\tKi = %f\n\tKd = %f\n', Rp_Kp, Rp_Ki, Rp_Kd);
 
 % setting up input and output names 
 Rp.u = 'e_{p}'; 
@@ -184,4 +186,4 @@ u = [ zeros(length(t1),1);
 T0 = connect(G, Rp, eInner, Rphi, eOuter, {'\phi0'}, {'e_{\phi}', '\delta_{lat}'}); 
 
 %% figure plot
-run feedbackPlot;
+feedbackPlot(WPinv, WSinv, WQinv, T, t, y, u);
