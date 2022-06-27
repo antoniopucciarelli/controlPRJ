@@ -73,7 +73,7 @@ F = connect(G_nom, Rp, eInner, Rphi, eOuter, {'\phi0'}, {'p', '\phi'});
 % outputs:  
 % --- phi error (eOuter)
 % --- delta
-T0 = connect(G_nom, Rp, eInner, Rphi, eOuter, {'\phi0'}, {'e_{\phi}', '\delta_{lat}'}); 
+CL0 = connect(G_nom, Rp, eInner, Rphi, eOuter, {'\phi0'}, {'e_{\phi}', '\delta_{lat}'}); 
 
 %% 2nd order phi0 response transfer function assembly 
 % design requirements: [A] nominal performance --> phi response to phi0
@@ -107,7 +107,7 @@ WPinv = tf([1, omega_b*A], [1/M, omega_b]);
 % this time it has been used the same (2.44) refernce equation from skogestad book 
 % but the tuning has been done throught a trial and error approach 
 A       = 0.5;
-M       = 0.12;
+M       = 0.10;
 omega_b = 1.43e+3; 
 
 % control effort moderation weight function
@@ -136,13 +136,13 @@ opt = systuneOptions('RandomStart', nTest, 'SoftTol', 1e-7, 'Display', 'final');
 % tuning control system 
 % systune gets in input parametrized transfer functions and parametrized constraint/requirements 
 % input definition: 
-% -- closed loop model -> T0 
+% -- closed loop model -> CL0 
 % -- control constraints/goals -> req
-[T, J, ~] = systune(T0, req, opt);
+[CL, J, ~] = systune(CL0, req, opt); % CL: sensitivity
 
 % getting values from the tuning results
-Rp   = T.blocks.Rp;
-Rphi = T.blocks.Rphi;
+Rp   = CL.blocks.Rp;
+Rphi = CL.blocks.Rphi;
 
 % block coefficients after tuning
 [Rphi_Kp,~,~,~] = piddata(Rphi);
@@ -178,12 +178,7 @@ u = [ zeros(length(t1),1);
       zeros(length(t4),1) ];
 
 % computing system response and translating it into time domain 
-[y, x] = lsim(T(2).A, T(2).B, T(2).C, T(2).D, u, t);
-
-%% uncertain system assembly 
-% this new system contains the uncertainty of the system dynamics
-% the complete plant is made by the uncertain system dynamics equipped with the P and PID controllers from the nominal design study 
-T0 = connect(G, Rp, eInner, Rphi, eOuter, {'\phi0'}, {'e_{\phi}', '\delta_{lat}'}); 
+[y, x] = lsim(CL(2).A, CL(2).B, CL(2).C, CL(2).D, u, t);
 
 %% figure plot
-feedbackPlot(WPinv, WSinv, WQinv, T, t, y, u);
+feedbackPlot(WPinv, WSinv, WQinv, CL, t, y, u);

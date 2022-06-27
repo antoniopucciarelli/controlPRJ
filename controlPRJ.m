@@ -32,11 +32,14 @@ addpath(append(thisPath, '\data\'));
 run Gstudy; 
 
 %% system tuning 
-run feedbackDesign; 
+run feedbackDesign;
 
 %% robust analysis
+run uncertainAnalysis;
 
 %% design verification 
+run MUsynthesis;
+run monteCarlo;
 
 %% removing path 
 thisPath = pwd;

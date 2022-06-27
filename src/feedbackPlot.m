@@ -1,4 +1,4 @@
-function feedbackPlot(WPinv, WSinv, WQinv, T, t, y, u)
+function feedbackPlot(WPinv, WSinv, WQinv, CL, t, y, u)
 %   AEROSPACE CONTROL SYSTEM PROJECT -- AY 2021/2022
 %   authors:
 %       * Mate-Erik Moni 
@@ -39,14 +39,14 @@ bodemag(WPinv, 'b');
 hold on
 grid on
 grid minor 
-bodemag(T(1), 'r');  
+bodemag(CL(1), 'r');  
 legend('1/WP', 'Tuned system', 'location', 'northwest')
 title('1st constraint check')
 saveas(sensitivityWeight, 'figure\sensitivityWeight', 'epsc');
 
 % sensitivity vs performance weight check
 sensitivityCheck = figure;
-bodemag(minreal(T(1)/WPinv), 'b');
+bodemag(minreal(CL(1)/WPinv), 'b');
 grid on
 grid minor 
 title('Sensitivity under the weight: |WP * S|_{Inf} < 1')
@@ -58,7 +58,7 @@ bodemag(WQinv, 'b')
 grid on 
 grid minor 
 hold on 
-bodemag(T(2), 'r')
+bodemag(CL(2), 'r')
 legend('1/WQ', 'Tuned system', 'location', 'southeast')
 title('2nd constraint check')
 saveas(controlWeight, 'figure\controlWeight', 'epsc');
